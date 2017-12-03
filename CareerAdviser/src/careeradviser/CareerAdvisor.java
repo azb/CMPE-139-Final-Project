@@ -23,7 +23,7 @@ import javafx.scene.control.ProgressBar;
  * @author Arthur Z. Baney
  */
 
-public class CareerAdviser extends Application {
+public class CareerAdvisor extends Application {
     
     static long timerSeconds = 0; // = new Timer();
     static long lastTime = System.nanoTime();
