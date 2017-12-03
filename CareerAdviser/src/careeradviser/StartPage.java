@@ -91,12 +91,12 @@ public class StartPage {
                 List<String> skillsList = new ArrayList<String>(Arrays.asList(skills.split(",")));
                 
                 //Create an array for the parameters to pass into the python backend
-                String[] params = new String [1]; //+skillsList.size()];
+                //String[] params = new String [1]; //+skillsList.size()];
 
                 //Set the first parameter to the python program to execute
                 
                 String workingDir = System.getProperty("user.dir");
-                params[0] = "C:\\Python27\\python.exe \""+workingDir+"\\careerAdviserBackend.py\"";
+                //params[0] = "C:\\Python27\\python.exe \""+workingDir+"\\dummy.py\""; //careerAdviserBackend
                 
                 String argStr = "\"";
                 for(int i = 0 ; i < skillsList.size() ; i++)
@@ -109,7 +109,7 @@ public class StartPage {
                 }
                 argStr += "\"";
                 
-                String pythonCommand = "\""+workingDir+"\\careerAdviserBackend.py\" "+argStr;
+                String pythonCommand = "\""+workingDir+"\\dummy.py\" "+argStr;
                 
                 System.out.println(pythonCommand);
                 
