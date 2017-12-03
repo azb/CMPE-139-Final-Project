@@ -12,7 +12,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -21,6 +20,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.control.Alert;
@@ -38,12 +39,13 @@ import javafx.scene.paint.Color;
 public class StartPage {
     
     WaitingPage waitingPage = new WaitingPage();
-        
+
+    
     public void start(Stage primaryStage){
     
     //Progressbar to show search progress (TODO: move this to the waiting screen)
     ProgressBar fileLoadingProgress = new ProgressBar(0.6);
-        
+    
     //Initialize Interface Components
     
     //Welcome label, gives user instructions for how to use program
@@ -89,12 +91,12 @@ public class StartPage {
                 List<String> skillsList = new ArrayList<String>(Arrays.asList(skills.split(",")));
                 
                 //Create an array for the parameters to pass into the python backend
-                String[] params = new String [1]; //+skillsList.size()];
+                //String[] params = new String [1]; //+skillsList.size()];
 
                 //Set the first parameter to the python program to execute
                 
                 String workingDir = System.getProperty("user.dir");
-                params[0] = "C:\\Python27\\python.exe \""+workingDir+"\\careerAdviserBackend.py\"";
+                //params[0] = "C:\\Python27\\python.exe \""+workingDir+"\\dummy.py\""; //careerAdviserBackend
                 
                 String argStr = "\"";
                 for(int i = 0 ; i < skillsList.size() ; i++)
@@ -107,14 +109,13 @@ public class StartPage {
                 }
                 argStr += "\"";
                 
-                String pythonCommand = "\""+workingDir+"\\careerAdviserBackend.py\" "+argStr;
+                String pythonCommand = "\""+workingDir+"\\dummy.py\" "+argStr;
                 
                 System.out.println(pythonCommand);
                 
                 ProcessBuilder pb = new ProcessBuilder("C:\\Python27\\python.exe", pythonCommand);
                 try {
                     Process p = pb.start();
-                    System.out.println("HERE");
                     } catch (IOException ex) {
                     Logger.getLogger(StartPage.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -140,7 +141,7 @@ public class StartPage {
     Scene scene = new Scene(root, 1024, 768);
 
     //Set the title of the window
-    primaryStage.setTitle("Career Adviser Pro 2017");
+    primaryStage.setTitle("Career Adviser Pro 2017 - Search");
     
     //Set the primary window to display the scene next time show() is called
     primaryStage.setScene(scene);

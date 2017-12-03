@@ -5,7 +5,10 @@
  */
 package careeradviser;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -20,13 +23,14 @@ import javafx.stage.Stage;
 
 /**
  *startPage
- * @author Arthur
+ * @author Arthur Z. Baney
  */
 public class WaitingPage {
         
-    public void start(Stage primaryStage){
+    public void start(Stage primaryStage) {
         
         StartPage startPage = new StartPage();
+        ResultsPage resultsPage = new ResultsPage();
         
         VBox root = new VBox();
         root.setSpacing(5);
@@ -38,7 +42,7 @@ public class WaitingPage {
         Button backButton = new Button();
         backButton.setText("Back");
         backButton.setOnAction(new EventHandler<ActionEvent>() {
-    
+            
             @Override
             public void handle(ActionEvent event) {
                 //System.out.println("Search Results:");
@@ -48,12 +52,34 @@ public class WaitingPage {
             }
         });
         
+        Button refreshButton = new Button();
+        refreshButton.setText("Refresh");
+        refreshButton.setOnAction(new EventHandler<ActionEvent>() {
+            
+            @Override
+            public void handle(ActionEvent event) {
+                //System.out.println("Search Results:");
+                
+                String workingDir = System.getProperty("user.dir");
+                
+                File tmpDir = new File(workingDir+"\\results.csv");
+                boolean exists = tmpDir.exists();
+                System.out.println("EXISTS = "+exists);
+                if (exists){
+                    resultsPage.start(primaryStage);
+                }
+                
+                
+            }
+        });
+        
         root.getChildren().add(loadingLabel);
         root.getChildren().add(backButton);
+        root.getChildren().add(refreshButton);
         
         Scene scene = new Scene(root, 1024, 768);
         
-        primaryStage.setTitle("Career Adviser Pro 2017");
+        primaryStage.setTitle("Career Adviser Pro 2017 - Waiting for Search Results");
         primaryStage.setScene(scene);
         primaryStage.show();
 }
