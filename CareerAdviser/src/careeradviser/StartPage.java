@@ -12,7 +12,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -21,6 +20,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.control.Alert;
@@ -38,12 +39,13 @@ import javafx.scene.paint.Color;
 public class StartPage {
     
     WaitingPage waitingPage = new WaitingPage();
-        
+
+    
     public void start(Stage primaryStage){
     
     //Progressbar to show search progress (TODO: move this to the waiting screen)
     ProgressBar fileLoadingProgress = new ProgressBar(0.6);
-        
+    
     //Initialize Interface Components
     
     //Welcome label, gives user instructions for how to use program
@@ -114,7 +116,6 @@ public class StartPage {
                 ProcessBuilder pb = new ProcessBuilder("C:\\Python27\\python.exe", pythonCommand);
                 try {
                     Process p = pb.start();
-                    System.out.println("HERE");
                     } catch (IOException ex) {
                     Logger.getLogger(StartPage.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -140,7 +141,7 @@ public class StartPage {
     Scene scene = new Scene(root, 1024, 768);
 
     //Set the title of the window
-    primaryStage.setTitle("Career Adviser Pro 2017");
+    primaryStage.setTitle("Career Adviser Pro 2017 - Search");
     
     //Set the primary window to display the scene next time show() is called
     primaryStage.setScene(scene);

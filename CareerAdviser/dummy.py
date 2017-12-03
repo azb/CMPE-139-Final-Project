@@ -18,5 +18,5 @@ df = pd.DataFrame(data=jobs)
 df = df.reindex(columns=['title', 'salary', 'description'])
 
 # write to a csv file
-df.to_csv("results.csv", sep='\t')
+df.to_csv("results.csv")
 print "Results successfully written to 'results.csv'."

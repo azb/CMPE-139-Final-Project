@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package careeradviser;
 
 import javafx.application.Application;
@@ -24,11 +19,15 @@ import java.nio.file.Paths;
 import javafx.scene.control.ProgressBar;
 
 /**
- *
- * @author Arthur
+ * Career Adviser
+ * @author Arthur Z. Baney
  */
+
 public class CareerAdviser extends Application {
     
+    static long timerSeconds = 0; // = new Timer();
+    static long lastTime = System.nanoTime();
+
         public enum ProgramState {
             AWAITING_INPUT,
             LOADING_FILES,
@@ -49,6 +48,20 @@ public class CareerAdviser extends Application {
      */
     public static void main(String[] args) {
         launch(args);
+        
+        System.out.println("here");
+        //FileCheckTimer();
+        
+        long time = System.nanoTime();
+        long deltaTime = ((time - lastTime) / 1000000);
+        lastTime = time;
+        
+        timerSeconds += deltaTime;
+        
+        if (timerSeconds > 3)
+            {
+                timerSeconds = 0;
+                System.out.println("Checking for file");
+            }
     }
-    
 }
