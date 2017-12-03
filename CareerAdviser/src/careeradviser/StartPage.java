@@ -89,27 +89,36 @@ public class StartPage {
                 List<String> skillsList = new ArrayList<String>(Arrays.asList(skills.split(",")));
                 
                 //Create an array for the parameters to pass into the python backend
-                String[] params = new String [1+skillsList.size()];
+                String[] params = new String [1]; //+skillsList.size()];
 
                 //Set the first parameter to the python program to execute
-                params[0] = "careerAdviserBackend.py";
-
-                //Add skills the user entered as command line arguments for the python program
-                for(int i = 0 ; i < skillsList.size(); i++ )
-                {
-                    params[i+1] = skillsList.get(i);
-                    System.out.println(params[i+1]);
-                }
-
-                //Print the params
                 
-                /*
-                    try {
-                        Runtime.getRuntime().exec(params);
+                String workingDir = System.getProperty("user.dir");
+                params[0] = "C:\\Python27\\python.exe \""+workingDir+"\\careerAdviserBackend.py\"";
+                
+                String argStr = "\"";
+                for(int i = 0 ; i < skillsList.size() ; i++)
+                {
+                    if (skillsList.get(i).charAt(0) == ' ')
+                        skillsList.set(i, skillsList.get(i).substring(1));
+                    argStr += skillsList.get(i);
+                    if (i < skillsList.size()-1)
+                        argStr += " ";
+                }
+                argStr += "\"";
+                
+                String pythonCommand = "\""+workingDir+"\\careerAdviserBackend.py\" "+argStr;
+                
+                System.out.println(pythonCommand);
+                
+                ProcessBuilder pb = new ProcessBuilder("C:\\Python27\\python.exe", pythonCommand);
+                try {
+                    Process p = pb.start();
+                    System.out.println("HERE");
                     } catch (IOException ex) {
-                        Logger.getLogger(StartPage.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                        */
+                    Logger.getLogger(StartPage.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
                 waitingPage.start(primaryStage);
                 }
     }});
