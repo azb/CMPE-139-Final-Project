@@ -40,7 +40,7 @@ def getEntriesWithSkill(  skill, jobDes = pd.read_csv("data job posts.csv", usec
                 ## This writes the jobe title as well
                 ##filewriter.writerow([index+2, str(row['Title']).replace('\r', '').replace('\n', '')])
                 
-    dfKeg = pd.read_csv("data job posts.csv")
+    dfKeg = pd.read_csv("keggleJobs.csv")
     return dfKeg 
 
 
