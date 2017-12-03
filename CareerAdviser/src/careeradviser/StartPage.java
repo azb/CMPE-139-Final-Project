@@ -103,7 +103,7 @@ public class StartPage {
                         skillsList.set(i, skillsList.get(i).substring(1));
                     argStr += skillsList.get(i);
                     if (i < skillsList.size()-1)
-                        argStr += " ";
+                        argStr += "|";
                 }
                 argStr += "\"";
                 
