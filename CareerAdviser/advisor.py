@@ -97,31 +97,55 @@ print "Fuzzy set created. (took {:.3f} s)".format(time.time() - task_start)
 
 # generate a fuzzy set with all the job titles
 task_start = time.time()
-print "Creating fuzzy set of skills..."
+print "Creating fuzzy set of job titles..."
 fuzzy_titles = FuzzySet([job for job in all_jobs['Title'] if type(job) == str])
 print "Fuzzy set created. (took {:.3f} s)".format(time.time() - task_start)
 
 # generate a skill vector
+task_start = time.time()
+print "Generating user's skills vector..."
 ind = [get_id(skill, tids, fuzzy_terms) for skill in skills]
 val = [1] * len(ind)
 ptr = [0, len(ind)]
-user_vector = csr_matrix((val, ind, ptr), shape = [1, mat.shape[0]], dtype=np.double)
-#csr_l2normalize(user_vector)
+user_vector = csr_matrix((val, ind, ptr), shape = [1, descs.shape[1]], dtype=np.double)
+print "Skills vector created. (took {:.3f} s)".format(time.time() - task_start)
 
 # add skills from previous jobs to user's skill vector
+task_start = time.time()
+print "Adding skills inferred from previous jobs..."
 for j in jobs:
     closest = fuzzy_titles[j][0][1]
-    index = np.where(all_jobs['Title']==closest)
+    index = np.where(all_jobs['Title']==closest)[0][0]
     user_vector = user_vector + descs[index]
 csr_l2normalize(user_vector)
+print "Skills vector is complete. (took {:.3f} s)".format(time.time() - task_start)
 
 # compare user's skill vector with job descriptions in database
+task_start = time.time()
+print "Comparing skills vector against potential jobs..."
 similar_jobs = [(i, sim(user_vector, descs[i], normalized=True)) for i in range(descs.shape[0])]
-sorted = similar_jobs.sort(key=lambda x: x[1])
-nearest_idx = [ listing[0] for listing in sorted[0:5] ]
-mask = [0] * descs.shape[0]
+print "Retrieved {} recommended jobs. (took {:.3f} s)".format(len(similar_jobs), time.time() - task_start)
+
+task_start = time.time()
+print "Sorting jobs..."
+similar_jobs.sort(key=lambda x: x[1])
+
+print "Retrieving 5 most relevant positions..."
+nearest_idx = [ listing[0] for listing in similar_jobs[0:5] ]
+mask = [False] * descs.shape[0]
+mask = np.zeros(descs.shape[0])
 for i in nearest_idx:
     mask[i] = 1
+selected = all_jobs[pd.Series(np.array(mask), dtype=bool)]
+selected = selected[['Title','FullDescription','SalaryNormalized']]
+selected['Salary'] = selected['SalaryNormalized'] * 1.34 # pounds to USD
+selected.pop('SalaryNormalized')
+selected.columns = ['title', 'description', 'salary']
+print "Retrieved 5 nearest jobs. (took {:.3f} s)".format(time.time() - task_start)
 
-selected = all_jobs[mask]
+task_start = time.time()
+print "Writing results to results.csv..."
 selected.to_csv('results.csv', sep=',')
+print "Results successfully written. (took {:.3f} s)".format(time.time() - task_start)
+
+print "Advisor has completed successfully. {:.3f} seconds have elapsed.".format(time.time() - start)
