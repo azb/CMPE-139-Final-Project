@@ -119,3 +119,9 @@ csr_l2normalize(user_vector)
 similar_jobs = [(i, sim(user_vector, descs[i], normalized=True)) for i in range(descs.shape[0])]
 sorted = similar_jobs.sort(key=lambda x: x[1])
 nearest_idx = [ listing[0] for listing in sorted[0:5] ]
+mask = [0] * descs.shape[0]
+for i in nearest_idx:
+    mask[i] = 1
+
+selected = all_jobs[mask]
+selected.to_csv('results.csv', sep=',')
