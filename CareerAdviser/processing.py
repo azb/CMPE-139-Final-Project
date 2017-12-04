@@ -38,10 +38,10 @@ def get_jobdesc_csr(df):
             if t not in idx:
                 idx[t] = tid
                 tid += 1
-    
+
     # record document frequencies of terms as well
     docfreq = defaultdict(int)
-    
+
     # get ind, val, & ptr arrays
     nrows = len(descs)
     ncols = len(idx)
@@ -61,7 +61,7 @@ def get_jobdesc_csr(df):
         ptr[i+1] = ptr[i] + l
         n += l
         i += 1
-    
+
     mat = csr_matrix((val, ind, ptr), shape=(nrows, ncols), dtype=np.double)
     return mat, idx, docfreq
 
@@ -86,7 +86,7 @@ def csr_idf(mat, copy=False, **kargs):
     # scale by idf
     for i in range(0, nnz):
         val[i] *= df[ind[i]]
-    
+
     return df if copy is False else mat
 
 # normalize matrix according to l2 norm
@@ -110,8 +110,8 @@ def csr_l2normalize(mat, copy=False, **kargs):
         for j in range(ptr[i], ptr[i+1]):
             val[j] *= rsum
 
-if copy is True:
-    return mat
+    if copy is True:
+        return mat
 
 # find the similarity between two rows
 def sim(row1, row2, normalized=False):
@@ -129,13 +129,13 @@ def csr_filter_cols(mat, threshold=3):
     drop = np.unique([k for k,v in cts.iteritems() if v < threshold])
     coo = mat.tocoo()
     keep = ~np.in1d(coo.col, drop)
-    
+
     # filter rows and cols to desired ones
     coo.row, coo.col, coo.data = coo.row[keep], coo.col[keep], coo.data[keep]
-    
+
     # decrement the col indices
     coo.col -= drop.searchsorted(coo.col)
-    
+
     # update the dimensions
     coo._shape = (coo.shape[0], coo.shape[1] - len(drop))
     mat = coo.tocsr()
