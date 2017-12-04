@@ -177,7 +177,7 @@ print "Normalization successful. (took {:.3f} s)".format(time.time() - task_star
 
 task_start = time.time()
 print "Saving to processed/job_descriptions.npz..."
-save_csr('processed/job_descriptions.npz', mat)
+save_csr('processed/job_descriptions.npz', mat, termids)
 print "File successfully saved. (took {:.3f} s)".format(time.time() - task_start)
 
 print "Preprocessing finished. {:.3f} seconds have elapsed.".format(time.time() - start)
