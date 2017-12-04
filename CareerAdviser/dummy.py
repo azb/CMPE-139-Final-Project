@@ -9,6 +9,8 @@ jobs = {'title': ['poopsmith', 'code monkey', 'burger-flipper'],
                        'US.obesity++'],
         'salary': ['$1', '$200000', '$min wage']}
 
+#ukDataSet = "Train_rev1.csv"
+
 print "Exporting results to 'results.csv'..."
 
 # generate dataframe from dictionary
