@@ -6,6 +6,7 @@
 import pandas as pd
 import numpy as np
 from scipy.sparse import csr_matrix
+from sklearn.neighbors import NearestNeighbors
 from fuzzyset import FuzzySet
 import time
 import sys
@@ -76,9 +77,12 @@ subprocess.call("java -jar CareerAdviser.jar", shell=True)
 #skills = ['c++', 'java', 'python']
 #jobs = ['cashier', 'tutor']
 with open('params.txt', 'rb') as fin:
-    params = fin.readlines()
+    params = fin.read().splitlines()
     skills = params[0].split('|')
     jobs = params[1].split('|')
+
+print "User's skills: {}".format(skills)
+print "User's past jobs: {}".format(jobs)
 
 # load the csv into memory
 start = time.time()
