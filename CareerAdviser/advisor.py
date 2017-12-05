@@ -9,6 +9,7 @@ from scipy.sparse import csr_matrix
 from fuzzyset import FuzzySet
 import time
 import sys
+import subprocess
 
 # load a csr into memory from a file
 def load_csr(filename):
@@ -66,16 +67,18 @@ def csr_l2normalize(mat, copy=False, **kargs):
     if copy is True:
         return mat
 
-# find the similarity between two rows
-def sim(row1, row2, normalized=False):
-    if normalized is False:
-        row1 = csr_l2normalize(row1, copy=True)
-        row2 = csr_l2normalize(row2, copy=True)
-    return row1.dot(row2.T).todense().item()
+# call the initial gui
+subprocess.call("java -jar CareerAdviser.jar", shell=True)
 
 # fetch the user input
-skills = sys.argv[1].split('|')
-jobs = sys.argv[2].split('|')
+#skills = sys.argv[1].split('|')
+#jobs = sys.argv[2].split('|')
+#skills = ['c++', 'java', 'python']
+#jobs = ['cashier', 'tutor']
+with open('params.txt', 'rb') as fin:
+    params = fin.readlines()
+    skills = params[0].split('|')
+    jobs = params[1].split('|')
 
 # load the csv into memory
 start = time.time()
@@ -92,13 +95,13 @@ print "File successfully loaded. (took {:.3f} s)".format(time.time() - task_star
 # generate a fuzzy set with all the terms in the job description corpus
 task_start = time.time()
 print "Creating fuzzy set of skills..."
-fuzzy_terms = FuzzySet(tids.keys())
+#fuzzy_terms = FuzzySet(tids.keys())
 print "Fuzzy set created. (took {:.3f} s)".format(time.time() - task_start)
 
 # generate a fuzzy set with all the job titles
 task_start = time.time()
 print "Creating fuzzy set of job titles..."
-fuzzy_titles = FuzzySet([job for job in all_jobs['Title'] if type(job) == str])
+#fuzzy_titles = FuzzySet([job for job in all_jobs['Title'] if type(job) == str])
 print "Fuzzy set created. (took {:.3f} s)".format(time.time() - task_start)
 
 # generate a skill vector
@@ -122,19 +125,12 @@ print "Skills vector is complete. (took {:.3f} s)".format(time.time() - task_sta
 
 # compare user's skill vector with job descriptions in database
 task_start = time.time()
-print "Comparing skills vector against potential jobs..."
-similar_jobs = [(i, sim(user_vector, descs[i], normalized=True)) for i in range(descs.shape[0])]
-print "Retrieved {} recommended jobs. (took {:.3f} s)".format(len(similar_jobs), time.time() - task_start)
-
-task_start = time.time()
-print "Sorting jobs..."
-similar_jobs.sort(key=lambda x: x[1])
-
-print "Retrieving 5 most relevant positions..."
-nearest_idx = [ listing[0] for listing in similar_jobs[0:5] ]
-mask = [False] * descs.shape[0]
+print "Finding relevant jobs..."
+knn = NearestNeighbors(n_neighbors=5, metric='cosine', algorithm='brute')
+knn.fit(descs)
+answers = knn.kneighbors(user_vector, return_distance=False)
 mask = np.zeros(descs.shape[0])
-for i in nearest_idx:
+for i in answers[0]:
     mask[i] = 1
 selected = all_jobs[pd.Series(np.array(mask), dtype=bool)]
 selected = selected[['Title','FullDescription','SalaryNormalized']]
@@ -147,5 +143,8 @@ task_start = time.time()
 print "Writing results to results.csv..."
 selected.to_csv('results.csv', sep=',')
 print "Results successfully written. (took {:.3f} s)".format(time.time() - task_start)
+
+# Call the gui with the completed results
+subprocess.call("java -jar CareerAdviser.jar results.csv", shell=True)
 
 print "Advisor has completed successfully. {:.3f} seconds have elapsed.".format(time.time() - start)
