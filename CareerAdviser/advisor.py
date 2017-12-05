@@ -95,13 +95,13 @@ print "File successfully loaded. (took {:.3f} s)".format(time.time() - task_star
 # generate a fuzzy set with all the terms in the job description corpus
 task_start = time.time()
 print "Creating fuzzy set of skills..."
-#fuzzy_terms = FuzzySet(tids.keys())
+fuzzy_terms = FuzzySet(tids.keys())
 print "Fuzzy set created. (took {:.3f} s)".format(time.time() - task_start)
 
 # generate a fuzzy set with all the job titles
 task_start = time.time()
 print "Creating fuzzy set of job titles..."
-#fuzzy_titles = FuzzySet([job for job in all_jobs['Title'] if type(job) == str])
+fuzzy_titles = FuzzySet([job for job in all_jobs['Title'] if type(job) == str])
 print "Fuzzy set created. (took {:.3f} s)".format(time.time() - task_start)
 
 # generate a skill vector
