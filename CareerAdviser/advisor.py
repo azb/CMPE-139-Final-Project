@@ -68,15 +68,35 @@ def csr_l2normalize(mat, copy=False, **kargs):
     if copy is True:
         return mat
 
+# valuate a skill, given its term id
+def valuate_skill(sid, mat, vals):
+    rows = rows_with_skill_id(sid, mat)
+    acc = 0.0
+    for row in rows:
+        acc += vals[row]
+    return acc/len(rows)
+
+GBP_to_USD = 1.34
+
+# used directories
+jobs_file     = 'data/adzuna/Train_rev1.csv'
+descs_file    = 'processed/job_descriptions.npz'
+jar_file      = 'dist/CareerAdviser.jar'
+params_file   = 'params.txt'
+jobs_output   = 'dist/jobs.tsv'
+skills_output = 'dist/skills.tsv'
+
 # call the initial gui
-subprocess.call("java -jar CareerAdviser.jar", shell=True)
+subprocess.call("java -jar {}".format(jar_file), shell=True)
 
 # fetch the user input
 #skills = sys.argv[1].split('|')
 #jobs = sys.argv[2].split('|')
 #skills = ['c++', 'java', 'python']
 #jobs = ['cashier', 'tutor']
-with open('params.txt', 'rb') as fin:
+
+print "Loading params from {}...".format(params_file)
+with open(params_file, 'rb') as fin:
     params = fin.read().splitlines()
     skills = params[0].split('|')
     jobs = params[1].split('|')
@@ -87,13 +107,13 @@ print "User's past jobs: {}".format(jobs)
 # load the csv into memory
 start = time.time()
 print "Loading csv into memory..."
-all_jobs = pd.read_csv('data/adzuna/Train_rev1.csv')
+all_jobs = pd.read_csv(jobs_file)
 print "Loading complete. (took {:.3f} s)".format(time.time() - start)
 
 # load the csr into memory
 task_start = time.time()
 print "Loading from processed/job_descriptions.npz..."
-descs, tids = load_csr('processed/job_descriptions.npz')
+descs, tids = load_csr(descs_file)
 print "File successfully loaded. (took {:.3f} s)".format(time.time() - task_start)
 
 # generate a fuzzy set with all the terms in the job description corpus
@@ -136,19 +156,31 @@ answers = knn.kneighbors(user_vector, return_distance=False)
 mask = np.zeros(descs.shape[0])
 for i in answers[0]:
     mask[i] = 1
-selected = all_jobs[pd.Series(np.array(mask), dtype=bool)]
-selected = selected[['Title','FullDescription','SalaryNormalized']]
-selected['Salary'] = selected['SalaryNormalized'] * 1.34 # pounds to USD
-selected.pop('SalaryNormalized')
-selected.columns = ['title', 'description', 'salary']
+selected_jobs = all_jobs[pd.Series(np.array(mask), dtype=bool)]
+selected_jobs = selected_jobs[['Title','FullDescription','SalaryNormalized']]
+selected_jobs['Salary'] = selected_jobs['SalaryNormalized'] * GBP_to_USD
+selected_jobs.pop('SalaryNormalized')
+selected_jobs.columns = ['title', 'description', 'salary']
+selected_jobs.set_index('title', inplace=True)
+selected_jobs.sort_values(by=['salary'], inplace=True, ascending=False)
 print "Retrieved 5 nearest jobs. (took {:.3f} s)".format(time.time() - task_start)
 
 task_start = time.time()
-print "Writing results to results.csv..."
-selected.to_csv('results.csv', sep=',')
+print "Valuating user's skills..."
+incomes = (all_jobs['SalaryNormalized'] * GBP_to_USD).tolist()
+skill_values = [valuate_skill(s, descs, incomes) for s in ind]
+skills_df = pd.DataFrame(data={'skill': skills, 'value': skill_values})
+skills_df.set_index('skill', inplace=True)
+skills_df.sort_values(by=['value'], inplace=True, ascending=False)
+print "Finished valuating skills. (took {:.3f} s)".format(time.time() - task_start)
+
+task_start = time.time()
+print "Writing results to {} and {}...".format(jobs_output, skills_output)
+selected_jobs.to_csv(jobs_output, sep='\t')
+skills_df.to_csv(skills_output, sep='\t')
 print "Results successfully written. (took {:.3f} s)".format(time.time() - task_start)
 
 # Call the gui with the completed results
-subprocess.call("java -jar CareerAdviser.jar results.csv", shell=True)
+subprocess.call("java -jar {} potato".format(jar_file), shell=True)
 
 print "Advisor has completed successfully. {:.3f} seconds have elapsed.".format(time.time() - start)
