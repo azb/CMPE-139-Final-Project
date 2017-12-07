@@ -74,17 +74,21 @@ def valuate_skill(sid, mat, vals):
     acc = 0.0
     for row in rows:
         acc += vals[row]
-    return acc/len(rows)
+    return acc/len(rows), len(rows)
 
 GBP_to_USD = 1.34
 
 # used directories
 jobs_file     = 'data/adzuna/Train_rev1.csv'
-descs_file    = 'processed/job_descriptions.npz'
+descs_file    = 'job_descriptions.npz'
 jar_file      = 'dist/CareerAdviser.jar'
 params_file   = 'params.txt'
-jobs_output   = 'dist/jobs.tsv'
-skills_output = 'dist/skills.tsv'
+jobs_output   = 'jobs.tsv'
+skills_output = 'skills.tsv'
+
+# if the user supplies the directory for the training data
+if len(sys.argv) > 1:
+    jobs_file = sys.argv[1]
 
 # call the initial gui
 subprocess.call("java -jar {}".format(jar_file), shell=True)
@@ -168,8 +172,11 @@ print "Retrieved 5 nearest jobs. (took {:.3f} s)".format(time.time() - task_star
 task_start = time.time()
 print "Valuating user's skills..."
 incomes = (all_jobs['SalaryNormalized'] * GBP_to_USD).tolist()
-skill_values = [valuate_skill(s, descs, incomes) for s in ind]
-skills_df = pd.DataFrame(data={'skill': skills, 'value': skill_values})
+skill_results = [valuate_skill(s, descs, incomes) for s in ind]
+skill_values = [s[0] for s in skill_results]
+skill_num_jobs = [s[1] for s in skill_results]
+skills_df = pd.DataFrame(data={'skill': skills, 'value': skill_values, 'quantity': skill_num_jobs})
+skills_df = skills_df[['skill', 'value', 'quantity']]
 skills_df.set_index('skill', inplace=True)
 skills_df.sort_values(by=['value'], inplace=True, ascending=False)
 print "Finished valuating skills. (took {:.3f} s)".format(time.time() - task_start)
@@ -180,7 +187,9 @@ selected_jobs.to_csv(jobs_output, sep='\t')
 skills_df.to_csv(skills_output, sep='\t')
 print "Results successfully written. (took {:.3f} s)".format(time.time() - task_start)
 
+end = time.time()
+
 # Call the gui with the completed results
 subprocess.call("java -jar {} potato".format(jar_file), shell=True)
 
-print "Advisor has completed successfully. {:.3f} seconds have elapsed.".format(time.time() - start)
+print "Advisor has completed successfully. {:.3f} seconds have elapsed.".format(end - start)
