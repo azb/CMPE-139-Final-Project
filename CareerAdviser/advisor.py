@@ -11,6 +11,7 @@ from fuzzyset import FuzzySet
 import time
 import sys
 import subprocess
+import argparse
 
 # load a csr into memory from a file
 def load_csr(filename):
@@ -85,25 +86,39 @@ jar_file      = 'dist/CareerAdviser.jar'
 params_file   = 'params.txt'
 jobs_output   = 'jobs.tsv'
 skills_output = 'skills.tsv'
+parser = argparse.ArgumentParser()
+parser.add_argument("-t", "--train", action="store", help="location of training csv", dest="train")
+parser.add_argument("-c", "--cli", action="store_true", help="enable gui-less mode")
+parser.add_argument("-s", "--skills", nargs='+', action="store", help="list of user's skills", dest="skills")
+parser.add_argument("-j", "--jobs", nargs='+', action="store", help="list of user's jobs", dest="jobs")
+args = parser.parse_args()
 
 # if the user supplies the directory for the training data
-if len(sys.argv) > 1:
-    jobs_file = sys.argv[1]
+if args.train:
+    jobs_file = args.train
 
-# call the initial gui
-subprocess.call("java -jar {}".format(jar_file), shell=True)
+jobs = []
+if args.cli:
+    if args.skills is not None:
+        skills = args.skills
+        if args.jobs is not None:
+            jobs = args.jobs
+    else:
+        parser.print_usage()
+        print "{}: error: argument -c/--cli: expected --skills arg in gui-less mode.".format(parser.prog)
+        sys.exit()
+else:
+    # call the initial gui
+    subprocess.call("java -jar {}".format(jar_file), shell=True)
 
-# fetch the user input
-#skills = sys.argv[1].split('|')
-#jobs = sys.argv[2].split('|')
-#skills = ['c++', 'java', 'python']
-#jobs = ['cashier', 'tutor']
+    #skills = ['c++', 'java', 'python']
+    #jobs = ['cashier', 'tutor']
 
-print "Loading params from {}...".format(params_file)
-with open(params_file, 'rb') as fin:
-    params = fin.read().splitlines()
-    skills = params[0].split('|')
-    jobs = params[1].split('|')
+    print "Loading params from {}...".format(params_file)
+    with open(params_file, 'rb') as fin:
+        params = fin.read().splitlines()
+        skills = params[0].split('|')
+        jobs = params[1].split('|')
 
 print "User's skills: {}".format(skills)
 print "User's past jobs: {}".format(jobs)
@@ -190,6 +205,10 @@ print "Results successfully written. (took {:.3f} s)".format(time.time() - task_
 end = time.time()
 
 # Call the gui with the completed results
-subprocess.call("java -jar {} potato".format(jar_file), shell=True)
+if args.cli is None:
+    subprocess.call("java -jar {} potato".format(jar_file), shell=True)
+else:
+    print selected_jobs['salary']
+    print skills_df
 
 print "Advisor has completed successfully. {:.3f} seconds have elapsed.".format(end - start)
