@@ -6,6 +6,7 @@
 package careeradviser;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -33,8 +34,8 @@ public class ResultsPage {
 
         StartPage startPage = new StartPage();
         String workingDir = System.getProperty("user.dir");
-        String skillsFile = workingDir + "\\skills.tsv";
-        String jobsFile = workingDir + "\\jobs.tsv";
+        String skillsFile = workingDir + File.separator + "skills.tsv";
+        String jobsFile = workingDir  + File.separator + "jobs.tsv";
         //String[] skillsResults = new String[0];
         String[] jobsResults = new String[0];
 

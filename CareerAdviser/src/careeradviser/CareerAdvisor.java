@@ -35,7 +35,7 @@ public class CareerAdvisor extends Application {
             LOADING_FILES,
             DISPLAYING_RESULTS
         }
-        
+         
     @Override
     public void start(Stage primaryStage) {
         
