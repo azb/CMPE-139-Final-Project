@@ -1,0 +1,2 @@
+c++|c#|java|python|data mining
+software engineer|librarian|burger flipper|car driver|airplane mechanic

@@ -25,6 +25,8 @@ import javafx.scene.control.ProgressBar;
 
 public class CareerAdvisor extends Application {
     
+    private static String[] launchArgs;
+    
     static long timerSeconds = 0; // = new Timer();
     static long lastTime = System.nanoTime();
 
@@ -39,14 +41,27 @@ public class CareerAdvisor extends Application {
         
         ProgramState programState = ProgramState.AWAITING_INPUT;
         
-        StartPage startPage = new StartPage();
-        startPage.start(primaryStage);
+        System.out.println("STRAWBERRY");
+            
+        if (launchArgs.length == 0)
+        {
+            StartPage startPage = new StartPage();
+            System.out.println("TOMATO");
+            startPage.start(primaryStage);
+        }
+        else
+        {
+            ResultsPage resultsPage = new ResultsPage();
+            System.out.println("POTATO");
+            resultsPage.start(primaryStage);
+        }
     }
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        launchArgs = args;
         launch(args);
         
         System.out.println("here");

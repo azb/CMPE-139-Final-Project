@@ -80,7 +80,7 @@ public class KaggleOEMatcher {
         
         Scene scene = new Scene(root, 1024, 768);
         
-        primaryStage.setTitle("Career Adviser Pro 2017 - Kaggle OE Data");
+        primaryStage.setTitle("Career Advisor Pro 2017 - Kaggle OE Data");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
